@@ -1,0 +1,10 @@
+[webserver]
+web-prod-01 ansible_host=10.0.1.10
+web-prod-02 ansible_host=10.0.1.11
+
+[databases]
+db-prod-01 ansible_host=10.0.2.20
+
+[all:vars]
+environment_name=production
+db_name=prod_db

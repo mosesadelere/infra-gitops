@@ -1,0 +1,37 @@
+appVersion: 1.0.0
+Kind: Deployment
+Metadata:
+  Name: myapp-deployment
+  Labels:
+    App: myapp
+Spec:
+  Replicas: 3
+  Selector:
+    MatchLabels:
+      App: myapp
+  Template:
+    Metadata:
+      Labels:
+        App: myapp
+    Spec:
+      Containers:
+        - Name: myapp-container
+          Image: myapp:1.0.0
+          Ports:
+            - ContainerPort: 80
+
+---
+apiVersion: v1
+Kind: Service
+Metadata:
+  Name: myapp-service
+  Labels:
+    App: myapp
+Spec:
+  Type: LoadBalancer
+  Selector:
+    App: myapp
+  Ports:
+    - Protocol: TCP
+      Port: 80
+      TargetPort: 80 

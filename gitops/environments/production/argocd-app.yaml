@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+Kind: Application
+Metadata:
+  Name: myapp
+  Namespace: argocd
+Spec:
+  Project: default
+  Source:
+    RepoURL: 'https://github.com/mosesadelere/infra-gitops.git'
+    TargetRevision: HEAD
+    path: gitops/applications/myapp
+  Destination:
+    Server: 'https://kubernetes.default.svc'
+    Namespace: production
+  SyncPolicy:
+    Automated:
+      Prune: true
+      SelfHeal: true
