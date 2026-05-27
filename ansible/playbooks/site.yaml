@@ -1,0 +1,20 @@
+---
+- name: Provision and Configure Servers
+  hosts: all
+  become: true
+  roles:
+    - common
+    - webserver
+    - database
+
+- name: Configure web application
+  hosts: webservers
+  become: true
+  roles:
+    - webserver
+
+- name: Configure database
+  hosts: databases
+  become: true
+  roles:
+    - database

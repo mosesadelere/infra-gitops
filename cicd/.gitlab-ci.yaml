@@ -1,0 +1,30 @@
+stages:
+  - lint
+  - test
+  - deploy
+
+ansible-lint:
+  stage: lint
+  image: python:3.12
+  script:
+    - pip install ansible ansible-lint
+    - ansible-lint ansible/playbooks/*.yml
+    - ansible-lint ansible/roles/*/
+
+ansible-syntax-check:
+  stage: test
+  image: python:3.12
+  script:
+    - pip install ansible
+    - ansible-playbook ansible/playbooks/*.yml --syntax-check
+    - ansible-playbook ansible/roles/*/tasks/*.yml --syntax-check
+
+deploy_production:
+  stage: deploy
+  image: python:3.12
+  script:
+    - pip install ansible
+    - ansible-playbook ansible/playbooks/deploy.yml -i ansible/inventory/production.ini
+  only:
+    - main
+  when: manual

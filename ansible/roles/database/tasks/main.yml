@@ -1,0 +1,23 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for database
+- name: Install MariaDB server
+  apt:
+    name: mariadb-server
+    state: present
+  become: true
+
+- name: Start and enable MariaDB service
+  systemd:
+    name: mariadb
+    state: started
+    enabled: true
+  become: true
+  notify: Restart MariaDB
+
+- name: Ensure database is created
+  mysql_db:
+    name: myapp_db
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  become: true
