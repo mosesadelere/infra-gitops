@@ -1,0 +1,45 @@
+name: GitOps Deploy
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Validate Kubernetes Manifests
+        uses: kube-linter/kube-linter-action@v0.1.0
+        with:
+          args: --config .github/workflows/kube-linter-config.yaml
+
+      - name: Deploy to Kubernetes using ArgoCD
+        uses: argoproj/argocd-action@v1.0.0
+        with:
+          argocd-server: 'https://argocd-server.argocd.svc.cluster.local'
+          argocd-username: ${{ secrets.ARGOCD_USERNAME }}
+          argocd-password: ${{ secrets.ARGOCD_PASSWORD }}
+          app-name: 'myapp'
+          app-namespace: 'argocd'
+          repo-url: 'https://github.com/myorg/myapp.git'
+          target-revision: 'HEAD'
+          
+      - name: Notify Deployment Success
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "Deployment of myapp to production was successful! :tada:"
+            }
+          channel-id: 'C1234567890'
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "Deployment successful, sending Slack notification."
+          else
+            echo "Deployment failed, skipping Slack notification."
+            exit 1
+          fi
